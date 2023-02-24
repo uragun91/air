@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,6 +33,12 @@ func main() {
 	router.POST("/product", postProduct)
 	router.GET("/product/:id", getProductById)
 
-	router.Run("localhost:8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	if err := router.Run(":" + port); err != nil {
+    log.Panicf("error: %s", err)
+	}
 }
 
