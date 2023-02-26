@@ -1,0 +1,15 @@
+services:
+  api-postgres:
+    container_name: air-api-database-dev
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      PG_DATA: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata-air:/var/lib/postgresql/data
+volumes:
+  pgdata-air:
