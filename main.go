@@ -1,6 +1,7 @@
 package main
 
 import (
+	"air-api/middlewares"
 	"log"
 	"os"
 
@@ -29,9 +30,12 @@ var products = []Product{
 
 func main() {
 	router := gin.Default()
-	router.GET("/product", getProducts)
-	router.POST("/product", postProduct)
-	router.GET("/product/:id", getProductById)
+
+	protectedRouterGroup := router.Group("/api").Use(middlewares.JwtAuthMiddleware());
+
+	protectedRouterGroup.GET("/product", getProducts);
+	protectedRouterGroup.POST("/product", postProduct);
+	protectedRouterGroup.GET("/product/:id", getProductById);
 
 	port := os.Getenv("PORT")
 	if port == "" {
