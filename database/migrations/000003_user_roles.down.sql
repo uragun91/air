@@ -1,0 +1,6 @@
+BEGIN;
+
+DROP TABLE IF EXISTS "roles_users";
+DROP TABLE IF EXISTS "roles";
+
+COMMIT;

@@ -1,3 +1,5 @@
+BEGIN;
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table
@@ -9,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   "photo"       VARCHAR       NOT NULL,
   "verified"    BOOLEAN       NOT NULL,
   "password"    VARCHAR       NOT NULL,
-  "role"        VARCHAR       NOT NULL,
+  "active"      BOOLEAN       NOT NULL DEFAULT true,
   "created_at"  TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at"  TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -32,8 +34,9 @@ CREATE TABLE IF NOT EXISTS "merchants" (
 -- Table to link merchants with users
 CREATE TABLE IF NOT EXISTS "merchants_users" (
   "user_id"     UUID NOT NULL,
-  "merchant_id" UUID NOT NULL
+  "merchant_id" UUID NOT NULL,
+
+  CONSTRAINT merchants_users_pkey PRIMARY KEY (user_id, merchant_id)
 );
 
--- Unique pair of ids
-CREATE UNIQUE INDEX IF NOT EXISTS unique_idx_user_id_merchant_id ON merchants_users(user_id, merchant_id);
+COMMIT;

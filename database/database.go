@@ -23,11 +23,11 @@ func ConnectDB() (error) {
 	// database variables
 	// usually we should get them from env like os.Getenv("variableName")
 	var (
-		host     = os.Getenv("DB_HOST")
-		portStr     = os.Getenv("DB_PORT")
-		user     = os.Getenv("DB_USER")
-		password = os.Getenv("DB_PASSWORD")
-		dbname   = os.Getenv("DB_NAME")
+		host			= os.Getenv("DB_HOST")
+		portStr		= os.Getenv("DB_PORT")
+		user     	= os.Getenv("DB_USER")
+		password 	= os.Getenv("DB_PASSWORD")
+		dbname   	= os.Getenv("DB_NAME")
 	)
 
 	port, err := strconv.ParseInt(portStr, 10, 0);
@@ -64,45 +64,23 @@ func RunMigrations() (error) {
 		return err;
 	}
 
-	err = upMigrations(migrations);
-	if err != nil {
-		dropMigrationSchema();
-		err = downMigrations(migrations);
-		if (err != nil) {
-			return err;
-		}
-	}
-
-	return nil;
+	return upMigrations(migrations);
 }
 
 func upMigrations(migrations *migrate.Migrate) (error) {
 	log.Print("migration: Starting UP migrations...");
 	err := migrations.Up();
-	if (err != nil) {
-		log.Print("migration: Unable to run UP migration");
-		log.Print(err);
+	if (err != nil && err != migrate.ErrNoChange) {
 
-		return err;
+		if (err == migrate.ErrNoChange) {
+			log.Print("migration: No new migrations found.");
+		} else {
+			log.Print("migration: Unable to run UP migration");
+			log.Fatal(err);
+		}
 	}
 
-	return nil;
-}
-
-func dropMigrationSchema() {
-	log.Print("Dropping migration schema...");
-	DB.Query("drop table schema_migrations;");
-}
-
-func downMigrations(migrations *migrate.Migrate) (error) {
-	log.Print("migration: Starting DOWN migrations...");
-	err := migrations.Down();
-	if (err != nil) {
-		log.Print("migration: Unable to run DOWN migration");
-		log.Fatal(err);
-
-		return err;
-	}
+	log.Print("migration: UP migrations completed");
 
 	return nil;
 }

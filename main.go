@@ -29,11 +29,12 @@ func main() {
 
 	router := gin.Default();
 
-	protectedRouterGroup := router.Group("/api").Use(middlewares.JwtAuthMiddleware());
+	privateRouterGroup := router.Group("/api/private").Use(middlewares.JwtAuthMiddleware());
+	publicRouterGroup := router.Group("/api");
 
-	protectedRouterGroup.GET("/product", products.GetProducts);
-	protectedRouterGroup.POST("/product", products.PostProduct);
-	protectedRouterGroup.GET("/product/:id", products.GetProductById);
+	publicRouterGroup.GET("/product", products.GetProducts);
+	publicRouterGroup.GET("/product/:id", products.GetProductById);
+	privateRouterGroup.POST("/product", products.PostProduct);
 
 	port := os.Getenv("PORT");
 
