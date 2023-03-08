@@ -11,36 +11,37 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GenerateToken(userId uint) (string, error) {
+func GenerateToken(userId string, role string) (string, error) {
 
-	tokenLifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
+	tokenLifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"));
 
 	if err != nil {
-		return "", err
+		return "", err;
 	}
 
-	claims := jwt.MapClaims{}
-	claims["authorized"] = true
-	claims["userId"] = userId
-	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	claims := jwt.MapClaims{};
+	claims["userId"] = userId;
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix();
+	claims["role"] = role;
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims);
 
-	return token.SignedString([]byte(os.Getenv("API_SECRET")))
-
+	return token.SignedString([]byte(os.Getenv("API_SECRET")));
 }
 
 func TokenValid(c *gin.Context) error {
-	tokenString := extractToken(c)
+	tokenString := extractToken(c);
 	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("API_SECRET")), nil
-	})
+		return []byte(os.Getenv("API_SECRET")), nil;
+	});
+
 	if err != nil {
-		return err
+		return err;
 	}
-	return nil
+
+	return nil;
 }
 
 func extractToken(c *gin.Context) string {
@@ -71,6 +72,7 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["userId"]), 10, 32)

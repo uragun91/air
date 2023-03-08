@@ -9,12 +9,24 @@ import (
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := auth.TokenValid(c)
+		err := auth.TokenValid(c);
 		if err != nil {
-			c.String(http.StatusUnauthorized, "Unauthorized")
-			c.Abort()
-			return
+			c.String(http.StatusUnauthorized, "Unauthorized");
+			c.Abort();
+			return;
 		}
-		c.Next()
+		c.Next();
+	}
+}
+
+func JwtAuthAdminMiddleware() gin.HandlerFunc {
+	return func (context *gin.Context) {
+		err := auth.TokenValid(context);
+		if err != nil {
+			context.String(http.StatusUnauthorized, "Unauthorized");
+			context.Abort();
+			return;
+		}
+		context.Next();
 	}
 }

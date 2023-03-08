@@ -1,6 +1,8 @@
 package main
 
 import (
+	avalid "air-api/air-valid"
+	"air-api/auth"
 	"air-api/database"
 	"air-api/middlewares"
 	"air-api/products"
@@ -23,18 +25,22 @@ func main() {
     log.Fatalf("Error loading .env file");
   }
 
-
 	database.ConnectDB();
 	database.RunMigrations();
 
+	avalid.RegisterValidators();
+
 	router := gin.Default();
 
-	privateRouterGroup := router.Group("/api/private").Use(middlewares.JwtAuthMiddleware());
-	publicRouterGroup := router.Group("/api");
+	merchantsRouterGroup := router.Group("/api/merchants").Use(middlewares.JwtAuthMiddleware());
+	customersRouterGroup := router.Group("/api");
 
-	publicRouterGroup.GET("/product", products.GetProducts);
-	publicRouterGroup.GET("/product/:id", products.GetProductById);
-	privateRouterGroup.POST("/product", products.PostProduct);
+	customersRouterGroup.GET("/product", products.GetProducts);
+	customersRouterGroup.GET("/product/:id", products.GetProductById);
+
+	merchantsRouterGroup.POST("/product", products.PostProduct);
+
+	customersRouterGroup.POST("/register", auth.RegisterUser)
 
 	port := os.Getenv("PORT");
 
